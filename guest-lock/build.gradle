@@ -1,0 +1,41 @@
+plugins {
+    id "net.fabricmc.fabric-loom-remap" version "${loom_version}"
+    id "java"
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+}
+
+processResources {
+    def version = project.version
+    def minecraftVersion = project.minecraft_version
+    inputs.property "version", version
+    inputs.property "minecraft_version", minecraftVersion
+
+    filesMatching("fabric.mod.json") {
+        expand "version": version, "minecraft_version": minecraftVersion
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 21
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}

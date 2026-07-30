@@ -1,0 +1,11 @@
+Background
+
+- bg_deepslate_ores.png
+  Built from real Minecraft block textures (deepslate + ore variants)
+  extracted from the installed game jar — not AI-generated.
+
+  Regenerate:
+    .\.venv\Scripts\python.exe make_deepslate_bg.py
+
+  Texture source folder (local extract):
+    assets/_mc_textures/

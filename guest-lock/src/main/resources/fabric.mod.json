@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "deepslate_guest_lock",
+  "version": "${version}",
+  "name": "Deepslate Guest Lock",
+  "description": "Blocks multiplayer for Deepslate launcher Guest mode when -Ddeepslate.guest=true.",
+  "authors": ["Deepslate Launcher"],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.deepslate.guestlock.GuestLockClient"]
+  },
+  "mixins": ["deepslate_guest_lock.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": "${minecraft_version}"
+  }
+}

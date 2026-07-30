@@ -1,0 +1,16 @@
+{
+  "client_id": "YOUR_AZURE_APP_CLIENT_ID",
+  "client_secret": "",
+  "redirect_uri": "https://login.microsoftonline.com/common/oauth2/nativeclient",
+  "minecraft_directory": null,
+  "jvm_arguments": ["-Xmx4G"],
+  "offline_username": "Player",
+  "last_version": "latest",
+  "mod_loader": "vanilla",
+  "curseforge_api_key": "",
+  "discord_rpc": true,
+  "discord_rpc_client_id": "",
+  "login_mode": "cracked",
+  "keep_launcher_open": true,
+  "servers": []
+}
