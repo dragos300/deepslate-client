@@ -1,0 +1,5 @@
+Deepslate Client — Windows
+
+1. Run Deepslate-Launcher-Setup-*.exe
+2. Finish the installer wizard
+3. If SmartScreen appears, choose More info → Run anyway

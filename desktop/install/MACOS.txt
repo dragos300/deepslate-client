@@ -1,0 +1,6 @@
+Deepslate Client — macOS
+
+1. Open the .dmg
+2. Drag Deepslate Launcher into Applications
+3. First launch: right-click the app → Open
+4. If macOS still blocks it, go to System Settings → Privacy & Security → Open Anyway

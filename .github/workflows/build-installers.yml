@@ -43,22 +43,12 @@ jobs:
         with:
           name: setups-${{ matrix.os }}
           path: |
-            setups/*.exe
-            setups/*.dmg
-            setups/*.AppImage
-            setups/*.deb
             setups/*.zip
-            setups/*.tar.gz
           if-no-files-found: error
       - name: Attach to GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            setups/*.exe
-            setups/*.dmg
-            setups/*.AppImage
-            setups/*.deb
             setups/*.zip
-            setups/*.tar.gz
           fail_on_unmatched_files: false

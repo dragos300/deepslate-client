@@ -1,28 +1,9 @@
 'use client'
 
-import { useEffect, useState, type ReactNode } from 'react'
-import type { PlatformDownloads } from '../../lib/release'
-import { RELEASES_PAGE } from '../../lib/release'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { GITHUB_REPO, type Platform, type PlatformDownloads } from '../../lib/release'
 
-type Os = 'windows' | 'mac' | 'linux'
-
-const steps: Record<Os, string[]> = {
-  windows: [
-    'Download the Windows setup and run it.',
-    'If SmartScreen appears, choose More info → Run anyway.',
-    'Finish the wizard, then open Deepslate Launcher from the Start menu.'
-  ],
-  mac: [
-    'Download the macOS disk image and open it.',
-    'Drag Deepslate Launcher into Applications.',
-    'First launch: right-click the app → Open. If macOS still blocks it, go to System Settings → Privacy & Security → Open Anyway.'
-  ],
-  linux: [
-    'Download the AppImage (or the .tar.gz if that is what you have).',
-    'AppImage: chmod +x Deepslate-Launcher-*.AppImage then run it.',
-    'Archive: tar -xf Deepslate-Launcher-*.tar.gz then run ./deepslate-launcher inside the extracted folder.'
-  ]
-}
+type Os = Platform
 
 function IconWin() {
   return (
@@ -48,6 +29,14 @@ function IconLinux() {
   )
 }
 
+function IconChevron() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden>
+      <path d="M6 9l6 6 6-6" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 function detectOs(): Os {
   if (typeof navigator === 'undefined') return 'windows'
   const ua = navigator.userAgent.toLowerCase()
@@ -56,38 +45,48 @@ function detectOs(): Os {
   return 'windows'
 }
 
+function downloadHref(os: Os): string {
+  return `/download/${os}`
+}
+
 export default function Downloads({ downloads }: { downloads: PlatformDownloads }) {
   const [os, setOs] = useState<Os>('windows')
+  const [open, setOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setOs(detectOs())
   }, [])
 
-  const platforms: Array<{ id: Os; label: string; file: string; href: string; icon: ReactNode }> = [
+  useEffect(() => {
+    if (!open) return
+    const onPointerDown = (event: PointerEvent) => {
+      if (!menuRef.current?.contains(event.target as Node)) setOpen(false)
+    }
+    window.addEventListener('pointerdown', onPointerDown)
+    return () => window.removeEventListener('pointerdown', onPointerDown)
+  }, [open])
+
+  const platforms: Array<{ id: Os; label: string; file: string; icon: ReactNode }> = [
     {
       id: 'windows',
       label: 'Windows',
-      file: 'Setup .exe',
-      href: downloads.windows.href,
+      file: downloads.windows.filename ?? 'Windows zip',
       icon: <IconWin />
     },
     {
       id: 'mac',
       label: 'macOS',
-      file: 'Disk image .dmg',
-      href: downloads.mac.href,
+      file: downloads.mac.filename ?? 'macOS zip',
       icon: <IconMac />
     },
     {
       id: 'linux',
       label: 'Linux',
-      file: 'AppImage / tar.gz',
-      href: downloads.linux.href,
+      file: downloads.linux.filename ?? 'Linux zip',
       icon: <IconLinux />
     }
   ]
-
-  const current = platforms.find((p) => p.id === os) ?? platforms[0]
 
   return (
     <section className="section download" id="download">
@@ -97,37 +96,41 @@ export default function Downloads({ downloads }: { downloads: PlatformDownloads 
           <h2>Get the installer</h2>
         </div>
         <div className="download-actions">
-          <a className="play-btn" href={current.href}>
-            {current.icon}
-            Download for {current.label}
-          </a>
-          <a className="ghost-btn" href={RELEASES_PAGE} target="_blank" rel="noreferrer">
-            All releases
+          <div className="download-menu" ref={menuRef}>
+            <button
+              type="button"
+              className="play-btn"
+              aria-expanded={open}
+              aria-haspopup="listbox"
+              onClick={() => setOpen((value) => !value)}
+            >
+              Download options
+              <IconChevron />
+            </button>
+            {open ? (
+              <div className="download-menu-list" role="listbox">
+                {platforms.map((platform) => (
+                  <a
+                    key={platform.id}
+                    role="option"
+                    className={platform.id === os ? 'current' : undefined}
+                    href={downloadHref(platform.id)}
+                    onClick={() => setOpen(false)}
+                  >
+                    {platform.icon}
+                    <span>
+                      <strong>{platform.label}</strong>
+                      <em>{platform.file}</em>
+                    </span>
+                  </a>
+                ))}
+              </div>
+            ) : null}
+          </div>
+          <a className="ghost-btn" href={GITHUB_REPO} target="_blank" rel="noreferrer">
+            View source
           </a>
         </div>
-      </div>
-
-      <div className="platform-grid">
-        {platforms.map((platform) => (
-          <article
-            className={`platform-card${platform.id === os ? ' current' : ''}`}
-            key={platform.id}
-          >
-            <h3>
-              {platform.icon}
-              {platform.label}
-            </h3>
-            <p className="platform-file">{platform.file}</p>
-            <ol>
-              {steps[platform.id].map((step) => (
-                <li key={step}>{step}</li>
-              ))}
-            </ol>
-            <a className="ghost-btn accent" href={platform.href}>
-              Download {platform.label}
-            </a>
-          </article>
-        ))}
       </div>
     </section>
   )

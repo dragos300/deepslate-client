@@ -20,6 +20,8 @@ export type DownloadInfo = {
   filename: string | null
 }
 
+export type Platform = 'windows' | 'mac' | 'linux'
+
 export type PlatformDownloads = {
   version: string | null
   windows: DownloadInfo
@@ -42,6 +44,30 @@ function toInfo(release: GithubRelease, asset: GithubAsset | undefined): Downloa
   }
 }
 
+function pickWindows(assets: GithubAsset[] | undefined): GithubAsset | undefined {
+  return (
+    pickAsset(assets, (name) => name.includes('windows') && (name.endsWith('.zip') || name.endsWith('.exe'))) ??
+    pickAsset(assets, (name) => name.endsWith('.exe') && (name.includes('setup') || name.includes('installer'))) ??
+    pickAsset(assets, (name) => name.endsWith('.exe'))
+  )
+}
+
+function pickMac(assets: GithubAsset[] | undefined): GithubAsset | undefined {
+  return (
+    pickAsset(assets, (name) => (name.includes('mac') || name.includes('darwin') || name.includes('osx')) && !name.includes('windows')) ??
+    pickAsset(assets, (name) => name.endsWith('.dmg'))
+  )
+}
+
+function pickLinux(assets: GithubAsset[] | undefined): GithubAsset | undefined {
+  return (
+    pickAsset(assets, (name) => name.includes('linux') || name.includes('ubuntu')) ??
+    pickAsset(assets, (name) => name.endsWith('.appimage')) ??
+    pickAsset(assets, (name) => name.endsWith('.tar.gz') || name.endsWith('.gz')) ??
+    pickAsset(assets, (name) => name.endsWith('.deb'))
+  )
+}
+
 export async function getLatestDownloads(): Promise<PlatformDownloads> {
   try {
     const res = await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=10`, {
@@ -49,7 +75,7 @@ export async function getLatestDownloads(): Promise<PlatformDownloads> {
         Accept: 'application/vnd.github+json',
         'User-Agent': 'deepslateclient.xyz'
       },
-      next: { revalidate: 300 }
+      next: { revalidate: 60 }
     })
 
     if (!res.ok) {
@@ -65,29 +91,11 @@ export async function getLatestDownloads(): Promise<PlatformDownloads> {
     }
 
     const assets = withAnySetup.assets
-    const windows = toInfo(
-      withAnySetup,
-      pickAsset(
-        assets,
-        (name) => name.endsWith('.exe') && (name.includes('setup') || name.includes('installer'))
-      ) ?? pickAsset(assets, (name) => name.endsWith('.exe'))
-    )
-    const mac = toInfo(
-      withAnySetup,
-      pickAsset(assets, (name) => name.endsWith('.dmg')) ?? pickAsset(assets, (name) => name.endsWith('.zip') && !name.includes('win'))
-    )
-    const linux = toInfo(
-      withAnySetup,
-      pickAsset(assets, (name) => name.endsWith('.appimage')) ??
-        pickAsset(assets, (name) => name.endsWith('.tar.gz') || name.endsWith('.gz')) ??
-        pickAsset(assets, (name) => name.endsWith('.deb'))
-    )
-
     return {
       version: withAnySetup.tag_name ?? withAnySetup.name ?? null,
-      windows,
-      mac,
-      linux
+      windows: toInfo(withAnySetup, pickWindows(assets)),
+      mac: toInfo(withAnySetup, pickMac(assets)),
+      linux: toInfo(withAnySetup, pickLinux(assets))
     }
   } catch {
     return { version: null, windows: empty, mac: empty, linux: empty }

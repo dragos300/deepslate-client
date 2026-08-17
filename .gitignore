@@ -21,3 +21,6 @@ setups/*.zip
 setups/*.tar.gz
 setups/*.gz
 setups/*.blockmap
+setups/windows/
+setups/macos/
+setups/linux/

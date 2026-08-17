@@ -1,7 +1,7 @@
 import { getLatestDownloads, GITHUB_REPO } from '../lib/release'
 import Downloads from './components/Downloads'
 
-export const revalidate = 300
+export const revalidate = 60
 
 const features = [
   {
@@ -75,14 +75,6 @@ export default async function HomePage() {
               Dark mineral UI, Fabric mods, and a HUD you can actually place. Windows, macOS, and Linux — Microsoft,
               Offline, or Guest.
             </p>
-            <div className="hero-actions">
-              <a className="play-btn" href="#download">
-                Get Deepslate
-              </a>
-              <a className="ghost-btn" href={GITHUB_REPO} target="_blank" rel="noreferrer">
-                View source
-              </a>
-            </div>
             <div className="pills">
               <span className="pill">
                 <strong>Windows</strong> · macOS · Linux

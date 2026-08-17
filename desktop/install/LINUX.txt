@@ -1,0 +1,10 @@
+Deepslate Client — Linux
+
+AppImage:
+  chmod +x Deepslate-Launcher-*.AppImage
+  ./Deepslate-Launcher-*.AppImage
+
+Archive:
+  tar -xf Deepslate-Launcher-*.tar.gz
+  cd the extracted folder
+  ./deepslate-launcher
