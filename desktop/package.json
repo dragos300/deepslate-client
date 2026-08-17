@@ -65,13 +65,13 @@
     ],
     "win": {
       "target": ["nsis"],
-      "icon": "icon.ico",
+      "icon": "../assets/icon.ico",
       "signAndEditExecutable": false,
       "artifactName": "${productName}-Setup-${version}.${ext}"
     },
     "mac": {
       "target": ["dmg"],
-      "icon": "../assets/icon.png",
+      "icon": "../assets/icon-1024.png",
       "category": "public.app-category.games",
       "hardenedRuntime": false,
       "gatekeeperAssess": false,
@@ -80,7 +80,7 @@
     },
     "linux": {
       "target": ["AppImage", "tar.gz"],
-      "icon": "../assets/icon.png",
+      "icon": "../assets/icon-1024.png",
       "category": "Game",
       "executableName": "deepslate-launcher",
       "synopsis": "Deepslate Minecraft launcher",
@@ -89,9 +89,9 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "installerIcon": "icon.ico",
-      "uninstallerIcon": "icon.ico",
-      "installerHeaderIcon": "icon.ico"
+      "installerIcon": "../assets/icon.ico",
+      "uninstallerIcon": "../assets/icon.ico",
+      "installerHeaderIcon": "../assets/icon.ico"
     }
   }
 }

@@ -1,12 +1,13 @@
 import path from 'path'
 import fs from 'fs'
-import { rcedit } from 'rcedit'
 
 /**
  * electron-builder afterPack: embed deepslate icon into the unpacked exe.
+ * rcedit is Windows-only — import it lazily so macOS/Linux packaging can load this hook.
  */
 export default async function afterPack(context) {
   if (context.electronPlatformName !== 'win32') return
+  const { rcedit } = await import('rcedit')
   const exeName = `${context.packager.appInfo.productFilename}.exe`
   const exePath = path.join(context.appOutDir, exeName)
   const iconPath = path.join(context.packager.projectDir, '..', 'assets', 'icon.ico')
