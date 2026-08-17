@@ -8,3 +8,8 @@ account.json
 dist/
 build/
 assets/_mc_textures/
+desktop/node_modules/
+desktop/out/
+desktop/release/
+website/node_modules/
+website/.next/

@@ -9,8 +9,9 @@
   "mod_loader": "vanilla",
   "curseforge_api_key": "",
   "discord_rpc": true,
-  "discord_rpc_client_id": "",
+  "discord_rpc_client_id": "1532090720989483128",
   "login_mode": "cracked",
   "keep_launcher_open": true,
+  "legacy4j_enabled": false,
   "servers": []
 }

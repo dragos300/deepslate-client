@@ -8,23 +8,25 @@ from typing import Any
 
 # Create an application at https://discord.com/developers/applications
 # then put its Application ID in config.json as discord_rpc_client_id.
-# Optional: Rich Presence → Art Assets → upload image named "deepslate".
+# Optional: Rich Presence → Art Assets → upload images named "deepslate" and "legacy4j".
 
 _presence: Any = None
 _lock = threading.Lock()
 _enabled = False
 _client_id = ""
+_legacy4j = False
 _start_ts: int | None = None
 _last_payload: dict[str, Any] | None = None
 
 
 def configure(config: dict[str, Any]) -> None:
     """Read settings from launcher config and (re)connect if needed."""
-    global _enabled, _client_id
+    global _enabled, _client_id, _legacy4j
     enabled = bool(config.get("discord_rpc", True))
     client_id = str(config.get("discord_rpc_client_id") or "").strip()
     _enabled = enabled and bool(client_id)
     _client_id = client_id
+    _legacy4j = bool(config.get("legacy4j_enabled", False))
     if not _enabled:
         clear()
         return
@@ -52,6 +54,16 @@ def _ensure_connected() -> bool:
             return False
 
 
+def _with_legacy(**kwargs: Any) -> dict[str, Any]:
+    out = dict(kwargs)
+    if _legacy4j:
+        state = out.get("state") or ""
+        out["state"] = f"{state} · Legacy4J" if state else "Legacy4J"
+        out.setdefault("small_image", "legacy4j")
+        out.setdefault("small_text", "Legacy4J · Console Edition")
+    return out
+
+
 def _update(**kwargs: Any) -> None:
     global _last_payload, _presence
     if not _ensure_connected():
@@ -59,7 +71,6 @@ def _update(**kwargs: Any) -> None:
     payload = {k: v for k, v in kwargs.items() if v is not None}
     if _start_ts is not None:
         payload.setdefault("start", _start_ts)
-    # Default art asset key — upload as "deepslate" in the Discord app
     payload.setdefault("large_image", "deepslate")
     payload.setdefault("large_text", "Deepslate Launcher")
     with _lock:
@@ -69,7 +80,6 @@ def _update(**kwargs: Any) -> None:
             _presence.update(**payload)
             _last_payload = payload
         except Exception:  # noqa: BLE001
-            # Discord closed / pipe died — retry next time
             try:
                 _presence.close()
             except Exception:  # noqa: BLE001
@@ -84,11 +94,11 @@ def set_idle(*, version_label: str = "", page: str = "play") -> None:
     else:
         details = "In the launcher"
         state = version_label or "Ready to play"
-    _update(details=details, state=state)
+    _update(**_with_legacy(details=details, state=state))
 
 
 def set_preparing(version_label: str) -> None:
-    _update(details="Preparing Minecraft", state=version_label or "…")
+    _update(**_with_legacy(details="Preparing Minecraft", state=version_label or "…"))
 
 
 def set_playing(
@@ -96,15 +106,26 @@ def set_playing(
     version_label: str,
     username: str = "",
     server_name: str | None = None,
+    legacy4j: bool | None = None,
 ) -> None:
-    details = f"Playing {version_label}" if version_label else "Playing Minecraft"
+    global _legacy4j
+    if legacy4j is not None:
+        _legacy4j = bool(legacy4j)
     if server_name:
-        state = f"On {server_name}"
-    elif username:
-        state = f"as {username}"
+        details = f"Playing on {server_name}"
+    elif _legacy4j:
+        details = "Playing · Console Edition"
+    elif version_label:
+        details = f"Playing {version_label}"
     else:
-        state = "In game"
-    _update(details=details, state=state)
+        details = "Playing Minecraft"
+    if username and not server_name:
+        state = f"as {username}"
+    elif version_label and server_name:
+        state = version_label
+    else:
+        state = version_label or "In game"
+    _update(**_with_legacy(details=details, state=state))
 
 
 def clear() -> None:

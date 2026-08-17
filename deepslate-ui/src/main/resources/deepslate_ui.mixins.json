@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.deepslate.ui.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "LogoRendererMixin",
+    "PauseScreenMixin",
+    "TitleScreenMixin",
+    "AbstractButtonMixin",
+    "MinecraftMixin",
+    "GuiMixin",
+    "GuiCrosshairMixin",
+    "GuiEffectsMixin",
+    "GameRendererMixin",
+    "MouseHandlerMixin",
+    "LightTextureMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

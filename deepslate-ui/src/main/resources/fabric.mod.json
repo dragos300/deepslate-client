@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "deepslate_ui",
+  "version": "${version}",
+  "name": "Deepslate UI",
+  "description": "Deepslate Client UI styling and Mods menu (Right Shift).",
+  "authors": ["Deepslate Client"],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.deepslate.ui.DeepslateUiClient"]
+  },
+  "mixins": ["deepslate_ui.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
