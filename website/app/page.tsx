@@ -1,4 +1,5 @@
-import { getLatestWindowsDownload, GITHUB_REPO, RELEASES_PAGE } from '../lib/release'
+import { getLatestDownloads, GITHUB_REPO } from '../lib/release'
+import Downloads from './components/Downloads'
 
 export const revalidate = 300
 
@@ -37,18 +38,8 @@ function IconGitHub() {
   )
 }
 
-function IconWin() {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M3 5.5 10.5 4.4v7.1H3V5.5Zm8.3-1.3L21 3v8.5h-9.7V4.2ZM3 13.5h7.5v7.1L3 19.5v-6Zm8.3 0H21V21l-9.7-1.4v-6.1Z" />
-    </svg>
-  )
-}
-
 export default async function HomePage() {
-  const download = await getLatestWindowsDownload()
-  const versionLabel = download.version ? download.version.replace(/^v/i, '') : null
-  const isDirectExe = Boolean(download.filename)
+  const downloads = await getLatestDownloads()
 
   return (
     <div className="page">
@@ -81,13 +72,12 @@ export default async function HomePage() {
               <em>Client</em>
             </h1>
             <p className="lede">
-              Dark mineral UI, Fabric mods, and a HUD you can actually place. Built for Windows — Microsoft, Offline, or
-              Guest.
+              Dark mineral UI, Fabric mods, and a HUD you can actually place. Windows, macOS, and Linux — Microsoft,
+              Offline, or Guest.
             </p>
             <div className="hero-actions">
-              <a className="play-btn" href={download.href}>
-                <IconWin />
-                Download for Windows
+              <a className="play-btn" href="#download">
+                Get Deepslate
               </a>
               <a className="ghost-btn" href={GITHUB_REPO} target="_blank" rel="noreferrer">
                 View source
@@ -95,7 +85,7 @@ export default async function HomePage() {
             </div>
             <div className="pills">
               <span className="pill">
-                <strong>Windows</strong> installer
+                <strong>Windows</strong> · macOS · Linux
               </span>
               <span className="pill">
                 <strong>Java</strong> Edition
@@ -148,33 +138,10 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="section download" id="download">
-          <div className="download-card">
-            <div>
-              <p className="eyebrow">Windows</p>
-              <h2>Get the installer</h2>
-              <p>
-                {isDirectExe
-                  ? `Latest GitHub Release${versionLabel ? ` (${versionLabel})` : ''}: ${download.filename}.`
-                  : 'No installer is attached to a GitHub Release yet — the button opens the Releases page until one is published.'}
-              </p>
-              <p className="fine">macOS and Linux builds are not available. Requires Minecraft Java Edition.</p>
-            </div>
-            <div className="download-actions">
-              <a className="play-btn" href={download.href}>
-                <IconWin />
-                {isDirectExe ? 'Download .exe' : 'Open Releases'}
-              </a>
-              <a className="ghost-btn" href={RELEASES_PAGE} target="_blank" rel="noreferrer">
-                All releases
-              </a>
-            </div>
-          </div>
-        </section>
+        <Downloads downloads={downloads} />
       </main>
 
       <footer className="footer">
-        <img src="/logo.png" alt="Deepslate Client" className="footer-logo" />
         <p>
           Deepslate Client is not affiliated with Mojang Studios or Microsoft. Minecraft is a trademark of Mojang
           Studios.

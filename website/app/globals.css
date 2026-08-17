@@ -480,15 +480,73 @@ a {
   box-shadow: var(--shadow);
 }
 
-.download-card p {
-  margin: 10px 0 0;
-  max-width: 52ch;
-  color: var(--muted);
+.ghost-btn.accent {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent-border);
+  min-height: 44px;
+  width: 100%;
+  margin-top: 8px;
 }
 
-.fine {
-  font-size: 0.85rem;
-  color: var(--faint) !important;
+.ghost-btn.accent:hover {
+  background: rgba(63, 212, 184, 0.22);
+  color: #7eecd6;
+}
+
+.platform-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.platform-card {
+  padding: 22px 20px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--glass);
+  backdrop-filter: blur(18px);
+}
+
+.platform-card.current {
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 1px var(--accent-soft);
+}
+
+.platform-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.platform-card h3 svg {
+  width: 18px;
+  height: 18px;
+  color: var(--accent);
+}
+
+.platform-file {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+.platform-card ol {
+  margin: 14px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.platform-card li + li {
+  margin-top: 8px;
 }
 
 .footer {
@@ -498,13 +556,6 @@ a {
   color: var(--faint);
   font-size: 0.82rem;
   line-height: 1.5;
-}
-
-.footer-logo {
-  display: block;
-  height: 42px;
-  width: auto;
-  margin-bottom: 14px;
 }
 
 .footer a {
@@ -528,6 +579,10 @@ a {
   .download-card {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .platform-grid {
+    grid-template-columns: 1fr;
   }
 
   .nav nav a:not(.nav-git) {

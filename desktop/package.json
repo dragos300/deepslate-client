@@ -9,7 +9,12 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
-    "dist": "npm run build && electron-builder --win",
+    "dist": "npm run build && electron-builder --win nsis --publish never",
+    "dist:linux": "npm run build && electron-builder --linux tar.gz --publish never",
+    "dist:linux:appimage": "npm run build && electron-builder --linux AppImage tar.gz --publish never",
+    "dist:mac": "npm run build && electron-builder --mac dmg --publish never",
+    "dist:all": "npm run build && electron-builder --win nsis --linux AppImage --mac dmg --publish never",
+    "copy-setups": "node scripts/copy-setups.mjs",
     "stamp-icon": "node scripts/stamp-icon.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json"
   },
@@ -59,9 +64,27 @@
       }
     ],
     "win": {
-      "target": ["nsis", "portable"],
+      "target": ["nsis"],
       "icon": "icon.ico",
-      "signAndEditExecutable": false
+      "signAndEditExecutable": false,
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "mac": {
+      "target": ["dmg"],
+      "icon": "../assets/icon.png",
+      "category": "public.app-category.games",
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
+      "identity": null,
+      "artifactName": "${productName}-${version}.${ext}"
+    },
+    "linux": {
+      "target": ["AppImage", "tar.gz"],
+      "icon": "../assets/icon.png",
+      "category": "Game",
+      "executableName": "deepslate-launcher",
+      "synopsis": "Deepslate Minecraft launcher",
+      "artifactName": "${productName}-${version}.${ext}"
     },
     "nsis": {
       "oneClick": false,

@@ -19,7 +19,7 @@ Open [http://localhost:3000](http://localhost:3000).
 3. Set **Root Directory** to `website`. Framework Preset: Next.js.
 4. Deploy. You will get a `*.vercel.app` URL first.
 
-The Download button reads the latest GitHub Release and prefers a Windows `.exe` (setup/installer over portable). If there is no release asset yet, it falls back to the Releases page.
+The Download button detects your OS and links the matching setup from GitHub Releases (Windows `.exe`, macOS `.dmg`, Linux AppImage).
 
 ## Custom domain (GoDaddy → Vercel)
 

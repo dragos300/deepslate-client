@@ -1,5 +1,5 @@
 const REPO = 'dragos300/deepslate-client'
-export const RELEASES_PAGE = `https://github.com/${REPO}/releases/latest`
+export const RELEASES_PAGE = `https://github.com/${REPO}/releases`
 export const GITHUB_REPO = `https://github.com/${REPO}`
 
 type GithubAsset = {
@@ -8,6 +8,7 @@ type GithubAsset = {
 }
 
 type GithubRelease = {
+  draft?: boolean
   tag_name?: string
   name?: string
   assets?: GithubAsset[]
@@ -19,17 +20,31 @@ export type DownloadInfo = {
   filename: string | null
 }
 
-function scoreAsset(name: string): number {
-  const lower = name.toLowerCase()
-  if (!lower.endsWith('.exe')) return -1
-  if (lower.includes('setup') || lower.includes('installer')) return 3
-  if (lower.includes('portable')) return 1
-  return 2
+export type PlatformDownloads = {
+  version: string | null
+  windows: DownloadInfo
+  mac: DownloadInfo
+  linux: DownloadInfo
 }
 
-export async function getLatestWindowsDownload(): Promise<DownloadInfo> {
+const empty: DownloadInfo = { href: RELEASES_PAGE, version: null, filename: null }
+
+function pickAsset(assets: GithubAsset[] | undefined, test: (name: string) => boolean): GithubAsset | undefined {
+  return (assets ?? []).find((asset) => test(asset.name.toLowerCase()))
+}
+
+function toInfo(release: GithubRelease, asset: GithubAsset | undefined): DownloadInfo {
+  if (!asset) return { ...empty, version: release.tag_name ?? release.name ?? null }
+  return {
+    href: asset.browser_download_url,
+    version: release.tag_name ?? release.name ?? null,
+    filename: asset.name
+  }
+}
+
+export async function getLatestDownloads(): Promise<PlatformDownloads> {
   try {
-    const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`, {
+    const res = await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=10`, {
       headers: {
         Accept: 'application/vnd.github+json',
         'User-Agent': 'deepslateclient.xyz'
@@ -38,25 +53,43 @@ export async function getLatestWindowsDownload(): Promise<DownloadInfo> {
     })
 
     if (!res.ok) {
-      return { href: RELEASES_PAGE, version: null, filename: null }
+      return { version: null, windows: empty, mac: empty, linux: empty }
     }
 
-    const data = (await res.json()) as GithubRelease
-    const assets = data.assets ?? []
-    const exe = [...assets]
-      .filter((asset) => scoreAsset(asset.name) >= 0)
-      .sort((a, b) => scoreAsset(b.name) - scoreAsset(a.name))[0]
+    const releases = (await res.json()) as GithubRelease[]
+    const published = releases.filter((release) => !release.draft)
+    const withAnySetup = published.find((release) => (release.assets ?? []).length > 0) ?? published[0]
 
-    if (!exe) {
-      return { href: RELEASES_PAGE, version: data.tag_name ?? null, filename: null }
+    if (!withAnySetup) {
+      return { version: null, windows: empty, mac: empty, linux: empty }
     }
+
+    const assets = withAnySetup.assets
+    const windows = toInfo(
+      withAnySetup,
+      pickAsset(
+        assets,
+        (name) => name.endsWith('.exe') && (name.includes('setup') || name.includes('installer'))
+      ) ?? pickAsset(assets, (name) => name.endsWith('.exe'))
+    )
+    const mac = toInfo(
+      withAnySetup,
+      pickAsset(assets, (name) => name.endsWith('.dmg')) ?? pickAsset(assets, (name) => name.endsWith('.zip') && !name.includes('win'))
+    )
+    const linux = toInfo(
+      withAnySetup,
+      pickAsset(assets, (name) => name.endsWith('.appimage')) ??
+        pickAsset(assets, (name) => name.endsWith('.tar.gz') || name.endsWith('.gz')) ??
+        pickAsset(assets, (name) => name.endsWith('.deb'))
+    )
 
     return {
-      href: exe.browser_download_url,
-      version: data.tag_name ?? data.name ?? null,
-      filename: exe.name
+      version: withAnySetup.tag_name ?? withAnySetup.name ?? null,
+      windows,
+      mac,
+      linux
     }
   } catch {
-    return { href: RELEASES_PAGE, version: null, filename: null }
+    return { version: null, windows: empty, mac: empty, linux: empty }
   }
 }

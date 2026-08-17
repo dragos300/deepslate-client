@@ -13,3 +13,11 @@ desktop/out/
 desktop/release/
 website/node_modules/
 website/.next/
+setups/*.exe
+setups/*.dmg
+setups/*.AppImage
+setups/*.deb
+setups/*.zip
+setups/*.tar.gz
+setups/*.gz
+setups/*.blockmap
