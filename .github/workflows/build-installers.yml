@@ -49,6 +49,9 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
+          name: Deepslate Client ${{ github.ref_name }}
+          prerelease: ${{ contains(github.ref_name, 'beta') }}
+          body_path: CHANGELOG.md
           files: |
             setups/*.zip
           fail_on_unmatched_files: false

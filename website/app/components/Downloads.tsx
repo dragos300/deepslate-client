@@ -104,8 +104,10 @@ export default function Downloads({ downloads }: { downloads: PlatformDownloads 
               aria-haspopup="listbox"
               onClick={() => setOpen((value) => !value)}
             >
-              Download options
-              <IconChevron />
+              <span className="play-btn-label">
+                Download options
+                <IconChevron />
+              </span>
             </button>
             {open ? (
               <div className="download-menu-list" role="listbox">

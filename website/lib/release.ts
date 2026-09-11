@@ -101,3 +101,43 @@ export async function getLatestDownloads(): Promise<PlatformDownloads> {
     return { version: null, windows: empty, mac: empty, linux: empty }
   }
 }
+
+export type ListedRelease = {
+  tag: string
+  name: string
+  href: string
+  prerelease: boolean
+  publishedAt: string | null
+}
+
+export async function getReleaseList(): Promise<ListedRelease[]> {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=20`, {
+      headers: {
+        Accept: 'application/vnd.github+json',
+        'User-Agent': 'deepslateclient.xyz'
+      },
+      next: { revalidate: 60 }
+    })
+    if (!res.ok) return []
+    const releases = (await res.json()) as Array<{
+      draft?: boolean
+      prerelease?: boolean
+      tag_name?: string
+      name?: string
+      html_url?: string
+      published_at?: string
+    }>
+    return releases
+      .filter((release) => !release.draft && release.tag_name)
+      .map((release) => ({
+        tag: release.tag_name as string,
+        name: release.name || (release.tag_name as string),
+        href: release.html_url || `${RELEASES_PAGE}/tag/${release.tag_name}`,
+        prerelease: !!release.prerelease,
+        publishedAt: release.published_at ?? null
+      }))
+  } catch {
+    return []
+  }
+}

@@ -40,6 +40,34 @@ Uses the same instance folder as the Python app:
 | Cracked | Vanilla | No | Yes |
 | Guest | Fabric + guest-lock | No | No (singleplayer) |
 
+## Enhanced client pack
+
+On Fabric launch (when **Enhanced client pack** is on in Settings), Deepslate syncs a curated
+Modrinth stack into `%APPDATA%\my-mc-launcher\client-mods\fabric-<version>\` (hidden from the
+user `mods` folder, loaded via `-Dfabric.addMods`):
+
+- **Playstyle profile** (PvP / Casual / Builder) filters which jars sync and syncs in-game templates
+- **Performance** — Sodium, Lithium, Entity Culling, FerriteCore, ImmediatelyFast, …
+- **QoL** — AppleSkin, Xaero’s maps, Zoomify, Jade, Litematica, REI, … (by profile)
+- **PvP / cosmetics** — Wavey Capes, Ping Wheel, 3D Skin Layers, … (PvP profile)
+- **Misc** — No Telemetry, Debugify, Voice Chat, Sound Physics, Ears, Auth Me, …
+
+In-game **Right Shift → Profiles / Mods** controls Deepslate UI features (freelook, CPS, toggle
+sprint, …). Mod Menu buttons are hidden; Deepslate Mods is the control surface.
+
+Inspiration (not affiliation): Lunar, Feather, Badlion, Dawn, and the Modrinth Fabric ecosystem.
+Full author credits: [`assets/client-mods/CREDITS.md`](assets/client-mods/CREDITS.md).
+
+## Host World
+
+Deepslate hosts are normal Minecraft Java endpoints (`host:port`) so anyone can join:
+
+1. Open a singleplayer world → pause → **Host World** (Open to LAN).
+2. **e4mc** (bundled in the client pack) publishes a public `.e4mc.link` address.
+3. The launcher **Host World** panel shows the join address — **Copy** for anyone, or **Save for friends** into the servers list for one-click Deepslate join.
+
+Guests do not need Deepslate or e4mc; matching Minecraft version is enough.
+
 ## Assets
 
 Shared with the Python tree: `assets/` (wallpaper, update art, guest-lock jars, icon).

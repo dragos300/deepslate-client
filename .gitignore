@@ -24,3 +24,4 @@ setups/*.blockmap
 setups/windows/
 setups/macos/
 setups/linux/
+*.tsbuildinfo

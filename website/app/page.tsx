@@ -1,5 +1,8 @@
-import { getLatestDownloads, GITHUB_REPO } from '../lib/release'
+import { getLatestDownloads, getReleaseList, GITHUB_REPO } from '../lib/release'
 import Downloads from './components/Downloads'
+import HeroVisual from './components/HeroVisual'
+import AccentControl from './components/AccentControl'
+import Versions from './components/Versions'
 
 export const revalidate = 60
 
@@ -26,7 +29,7 @@ const features = [
   },
   {
     title: 'Deepslate UI',
-    body: 'Custom logo, mint hover on menus, pause branding, and a Mods button — all toggleable in-game.'
+    body: 'Custom logo, hover on menus with customisable color using hex codes, pause branding, and a Mods button — all toggleable in-game.'
   }
 ]
 
@@ -39,7 +42,7 @@ function IconGitHub() {
 }
 
 export default async function HomePage() {
-  const downloads = await getLatestDownloads()
+  const [downloads, releases] = await Promise.all([getLatestDownloads(), getReleaseList()])
 
   return (
     <div className="page">
@@ -55,6 +58,7 @@ export default async function HomePage() {
         </a>
         <nav>
           <a href="#features">Features</a>
+          <a href="#versions">Versions</a>
           <a href="#download">Download</a>
           <a className="nav-git" href={GITHUB_REPO} target="_blank" rel="noreferrer">
             <IconGitHub />
@@ -69,7 +73,7 @@ export default async function HomePage() {
             <p className="eyebrow">Minecraft Java launcher</p>
             <h1 className="brand-mark">
               Deepslate
-              <em>Client</em>
+              <em>isn&apos;t useless.</em>
             </h1>
             <p className="lede">
               Dark mineral UI, Fabric mods, and a HUD you can actually place. Windows, macOS, and Linux — Microsoft,
@@ -86,32 +90,11 @@ export default async function HomePage() {
                 <strong>Free</strong> to use
               </span>
             </div>
+            <AccentControl />
           </div>
 
-          <div className="hero-stage" aria-hidden>
-            <div className="launcher">
-              <aside className="rail">
-                <div className="rail-brand">
-                  <img src="/icon.png" alt="" className="pixel" />
-                </div>
-                <span className="rail-dot on" />
-                <span className="rail-dot" />
-                <span className="rail-dot" />
-              </aside>
-              <div className="launcher-body">
-                <p className="launcher-kicker">Ready to launch</p>
-                <p className="launcher-title">
-                  Deepslate
-                  <em>Client</em>
-                </p>
-                <p className="launcher-sub">Pick a version, sign in, play.</p>
-                <div className="version-chip">
-                  <span>Version</span>
-                  <strong>Latest release</strong>
-                </div>
-                <div className="fake-play">PLAY</div>
-              </div>
-            </div>
+          <div className="hero-stage">
+            <HeroVisual />
           </div>
         </section>
 
@@ -131,6 +114,7 @@ export default async function HomePage() {
         </section>
 
         <Downloads downloads={downloads} />
+        <Versions releases={releases} />
       </main>
 
       <footer className="footer">
