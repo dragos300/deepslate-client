@@ -25,7 +25,7 @@ Output goes to `desktop/release/`, then `setups/`. macOS builds need a Mac or th
 
 ## Android (Cobbled Deepslate Client)
 
-Preview launcher in [`android/`](android/). Microsoft login, version picking, and official client download on Android 8+. The on-device Java runtime is not wired yet, so the game does not start on the phone in this slice.
+Preview launcher in [`android/`](android/). Microsoft login, version picking, official client download, and a Pojav-based Java runtime on Android 8+. First Play downloads the JRE and native engine onto the phone.
 
 Open the `android/` folder in Android Studio (JDK 17+). Debug APK:
 

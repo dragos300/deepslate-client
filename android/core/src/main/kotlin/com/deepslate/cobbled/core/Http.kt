@@ -24,3 +24,20 @@ fun cobbledHttpClient(): OkHttpClient =
             chain.proceed(builder.build())
         }
         .build()
+
+/** Long timeouts for JRE / asset / native packs. Sends Accept star-slash-star. */
+fun cobbledDownloadClient(base: OkHttpClient = cobbledHttpClient()): OkHttpClient =
+    base.newBuilder()
+        .readTimeout(15, TimeUnit.MINUTES)
+        .writeTimeout(15, TimeUnit.MINUTES)
+        .callTimeout(0, TimeUnit.MILLISECONDS)
+        .addInterceptor { chain ->
+            val original = chain.request()
+            chain.proceed(
+                original.newBuilder()
+                    .header("User-Agent", USER_AGENT)
+                    .header("Accept", "*/*")
+                    .build(),
+            )
+        }
+        .build()

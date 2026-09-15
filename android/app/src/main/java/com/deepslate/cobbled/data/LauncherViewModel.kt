@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.deepslate.cobbled.CobbledApplication
 import com.deepslate.cobbled.core.AuthException
+import com.deepslate.cobbled.core.CobbledJson
 import com.deepslate.cobbled.core.LauncherSettings
 import com.deepslate.cobbled.core.McAccount
 import com.deepslate.cobbled.core.ModHit
@@ -20,6 +21,12 @@ import kotlinx.coroutines.launch
 
 enum class LauncherPage { HOME, MODS, SETTINGS }
 
+data class GameLaunch(
+    val accountJson: String,
+    val launchPlanPath: String,
+    val ramGb: Int,
+)
+
 data class LauncherUiState(
     val page: LauncherPage = LauncherPage.HOME,
     val account: McAccount? = null,
@@ -31,8 +38,7 @@ data class LauncherUiState(
     val preparing: Boolean = false,
     val progress: PrepareProgress? = null,
     val toast: String? = null,
-    val runtimeReady: Boolean = false,
-    val preparedId: String? = null,
+    val launch: GameLaunch? = null,
     val mods: List<ModHit> = emptyList(),
     val modQuery: String = "",
     val modStatus: String = "Search Modrinth for Fabric mods that match your version.",
@@ -70,8 +76,21 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         _state.update { it.copy(toast = null) }
     }
 
-    fun dismissRuntime() {
-        _state.update { it.copy(runtimeReady = false) }
+    fun clearLaunch() {
+        _state.update { it.copy(launch = null, preparing = false, progress = null) }
+    }
+
+    fun syncAccount() {
+        val stored = c.store.loadAccount()
+        if (stored != _state.value.account) {
+            _state.update { it.copy(account = stored) }
+        }
+    }
+
+    fun onExternalAccount(json: String) {
+        runCatching { CobbledJson.decodeFromString(McAccount.serializer(), json) }
+            .onSuccess(::onSignedIn)
+            .onFailure { onSignInFailed(it.message ?: "Could not read Microsoft profile.") }
     }
 
     fun setRam(gb: Int) {
@@ -163,12 +182,12 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
             _state.update {
                 it.copy(
                     preparing = true,
-                    runtimeReady = false,
+                    launch = null,
                     progress = PrepareProgress("Refreshing Microsoft session…"),
                 )
             }
             try {
-                val fresh = runCatching { c.auth.refresh(account.refreshToken) }.getOrElse { err ->
+                val fresh = runCatching { c.auth.refresh(account) }.getOrElse { err ->
                     if (err is AuthException) throw err
                     account
                 }
@@ -181,11 +200,13 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
                 }
                 _state.update {
                     it.copy(
-                        preparing = false,
-                        progress = null,
-                        runtimeReady = true,
-                        preparedId = prepared.minecraftId,
-                        toast = "Downloaded Minecraft ${prepared.minecraftId}.",
+                        preparing = true,
+                        progress = PrepareProgress("Starting Minecraft ${prepared.minecraftId}…"),
+                        launch = GameLaunch(
+                            accountJson = CobbledJson.encodeToString(McAccount.serializer(), fresh),
+                            launchPlanPath = prepared.launchPlan.absolutePath,
+                            ramGb = it.settings.ramGb,
+                        ),
                     )
                 }
             } catch (err: Exception) {
@@ -206,7 +227,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             _state.update { it.copy(modsBusy = true, modStatus = "Searching Modrinth…") }
             try {
-                c.auth.refresh(account.refreshToken).let { fresh ->
+                c.auth.refresh(account).let { fresh ->
                     c.store.saveAccount(fresh)
                     _state.update { it.copy(account = fresh) }
                 }

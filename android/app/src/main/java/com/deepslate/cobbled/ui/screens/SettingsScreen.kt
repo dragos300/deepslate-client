@@ -44,11 +44,11 @@ fun SettingsScreen(
             .padding(horizontal = 20.dp),
     ) {
         Text("Settings", color = SlateInk, fontFamily = DisplayFont, fontWeight = FontWeight.Bold)
-        Text("Tune memory for the future JVM and keep your Microsoft session here.", color = SlateMuted, fontFamily = BodyFont)
+        Text("Memory for the on-device JVM, Microsoft login, and the Pojav Java runtime.", color = SlateMuted, fontFamily = BodyFont)
         Spacer(Modifier.height(20.dp))
 
         Text("Allocated memory", color = SlateInk, fontFamily = BodyFont, fontWeight = FontWeight.Bold)
-        Text("${state.settings.ramGb} GB — used when the on-device runtime starts the game.", color = SlateMuted, fontFamily = BodyFont)
+        Text("${state.settings.ramGb} GB — passed to the Pojav JVM as -Xmx when Play starts the game.", color = SlateMuted, fontFamily = BodyFont)
         Slider(
             value = state.settings.ramGb.toFloat(),
             onValueChange = { onRam(it.toInt()) },
@@ -63,7 +63,7 @@ fun SettingsScreen(
             Column(Modifier.weight(1f).padding(end = 12.dp)) {
                 Text("Enhanced client pack", color = SlateInk, fontFamily = BodyFont, fontWeight = FontWeight.Bold)
                 Text(
-                    "Same Sodium / Lithium stack as desktop Deepslate. Sync lands with the runtime.",
+                    "Same Sodium / Lithium stack as desktop Deepslate. Drop Fabric jars into the instance mods folder for now.",
                     color = SlateMuted,
                     fontFamily = BodyFont,
                 )
@@ -92,7 +92,7 @@ fun SettingsScreen(
         Spacer(Modifier.height(28.dp))
         Text("About", color = SlateInk, fontFamily = DisplayFont, fontWeight = FontWeight.Bold)
         Text(
-            "$APP_NAME $APP_VERSION\nAndroid launcher for Minecraft Java Edition. Not affiliated with Mojang or Microsoft.\nGame files download from Mojang after you sign in with an account that owns Java Edition.",
+            "$APP_NAME $APP_VERSION\nAndroid launcher for Minecraft Java Edition. Not affiliated with Mojang or Microsoft.\nPlay signs in with Microsoft, downloads official game files, then starts Java Edition through the Pojav OpenJDK + native engine (downloaded on first launch).\nPojavLauncher natives are licensed GPL-3.0.",
             color = SlateMuted,
             fontFamily = BodyFont,
         )

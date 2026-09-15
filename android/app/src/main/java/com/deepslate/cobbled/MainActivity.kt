@@ -10,13 +10,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.deepslate.cobbled.auth.MicrosoftLoginActivity
-import com.deepslate.cobbled.core.CobbledJson
-import com.deepslate.cobbled.core.McAccount
 import com.deepslate.cobbled.data.LauncherViewModel
+import com.deepslate.cobbled.runtime.GameActivity
 import com.deepslate.cobbled.ui.CobbledApp
 import com.deepslate.cobbled.ui.theme.CobbledTheme
 import com.deepslate.cobbled.ui.theme.SlateBg
@@ -30,6 +30,7 @@ class MainActivity : ComponentActivity() {
             navigationBarStyle = SystemBarStyle.dark(SlateBg.toArgb()),
         )
         super.onCreate(savedInstanceState)
+        consumeAccountExtra(intent)
         setContent {
             val state by viewModel.state.collectAsStateWithLifecycle()
             val login = rememberLauncherForActivityResult(
@@ -40,10 +41,21 @@ class MainActivity : ComponentActivity() {
                     if (!error.isNullOrBlank()) viewModel.onSignInFailed(error)
                     return@rememberLauncherForActivityResult
                 }
-                val json = result.data?.getStringExtra(MicrosoftLoginActivity.EXTRA_ACCOUNT) ?: return@rememberLauncherForActivityResult
-                runCatching { CobbledJson.decodeFromString(McAccount.serializer(), json) }
-                    .onSuccess(viewModel::onSignedIn)
-                    .onFailure { viewModel.onSignInFailed(it.message ?: "Could not read Microsoft profile.") }
+                val json = result.data?.getStringExtra(MicrosoftLoginActivity.EXTRA_ACCOUNT)
+                    ?: return@rememberLauncherForActivityResult
+                viewModel.onExternalAccount(json)
+            }
+
+            LaunchedEffect(state.launch) {
+                val launch = state.launch ?: return@LaunchedEffect
+                startActivity(
+                    Intent(this@MainActivity, GameActivity::class.java).apply {
+                        putExtra(GameActivity.EXTRA_ACCOUNT, launch.accountJson)
+                        putExtra(GameActivity.EXTRA_LAUNCH_PLAN, launch.launchPlanPath)
+                        putExtra(GameActivity.EXTRA_RAM, launch.ramGb)
+                    },
+                )
+                viewModel.clearLaunch()
             }
 
             CobbledTheme {
@@ -71,9 +83,25 @@ class MainActivity : ComponentActivity() {
                     onSearchMods = viewModel::searchMods,
                     onInstallMod = viewModel::installMod,
                     onDismissToast = viewModel::clearToast,
-                    onDismissRuntime = viewModel::dismissRuntime,
                 )
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        consumeAccountExtra(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.syncAccount()
+    }
+
+    private fun consumeAccountExtra(intent: Intent?) {
+        val json = intent?.getStringExtra(MicrosoftLoginActivity.EXTRA_ACCOUNT) ?: return
+        intent.removeExtra(MicrosoftLoginActivity.EXTRA_ACCOUNT)
+        viewModel.onExternalAccount(json)
     }
 }

@@ -21,7 +21,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -139,7 +138,7 @@ fun HomeScreen(
 
         Spacer(Modifier.height(28.dp))
         Text("SERVERS", color = SlateMuted, fontFamily = BodyFont, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
-        Text("Save Java addresses for later. Join still needs the on-device runtime.", color = SlateFaint, fontFamily = BodyFont)
+        Text("Save Java addresses. After Play starts the game, add them from the pause screen.", color = SlateFaint, fontFamily = BodyFont)
         Spacer(Modifier.height(10.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
             DarkField(value = serverName, onValueChange = { serverName = it }, hint = "Name", modifier = Modifier.weight(1f))
@@ -455,26 +454,4 @@ private fun AccountSheet(
             Spacer(Modifier.height(20.dp))
         }
     }
-}
-
-@Composable
-fun RuntimeDialog(version: String, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = Color(0xF2141A1C),
-        title = {
-            Text("Instance ready", color = SlateInk, fontFamily = DisplayFont, fontWeight = FontWeight.Bold)
-        },
-        text = {
-            Text(
-                "Minecraft $version is on this phone, along with your Microsoft session and mods folder.\n\n" +
-                    "Cobbled still needs the on-device Java / OpenGL runtime before it can start the game. That is the next slice — Play will launch from here once it lands.",
-                color = SlateText,
-                fontFamily = BodyFont,
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Got it", color = Accent) }
-        },
-    )
 }

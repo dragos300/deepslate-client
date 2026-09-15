@@ -44,7 +44,6 @@ import com.deepslate.cobbled.data.LauncherPage
 import com.deepslate.cobbled.data.LauncherUiState
 import com.deepslate.cobbled.ui.screens.HomeScreen
 import com.deepslate.cobbled.ui.screens.ModsScreen
-import com.deepslate.cobbled.ui.screens.RuntimeDialog
 import com.deepslate.cobbled.ui.screens.SettingsScreen
 import com.deepslate.cobbled.ui.theme.Accent
 import com.deepslate.cobbled.ui.theme.AccentSoft
@@ -73,7 +72,6 @@ fun CobbledApp(
     onSearchMods: () -> Unit,
     onInstallMod: (ModHit) -> Unit,
     onDismissToast: () -> Unit,
-    onDismissRuntime: () -> Unit,
 ) {
     Box(Modifier.fillMaxSize().background(SlateBg)) {
         AsyncImage(
@@ -153,13 +151,6 @@ fun CobbledApp(
                     shape = RoundedCornerShape(14.dp),
                 ) { Text(message, fontFamily = BodyFont) }
             }
-        }
-
-        if (state.runtimeReady) {
-            RuntimeDialog(
-                version = state.preparedId ?: state.versionLabel,
-                onDismiss = onDismissRuntime,
-            )
         }
     }
 }

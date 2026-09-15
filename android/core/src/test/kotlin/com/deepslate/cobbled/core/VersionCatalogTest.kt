@@ -53,13 +53,12 @@ class MicrosoftAuthRedirectTest {
     private val auth = MicrosoftAuthClient()
 
     @Test
-    fun authorizeUrlUsesXboxClientAndDesktopRedirect() {
+    fun authorizeUrlUsesPojavRedirectUrl() {
         val url = auth.authorizeUrl()
-        assertEquals("login.live.com", url.host)
-        assertEquals(MicrosoftAuthClient.CLIENT_ID, url.queryParameter("client_id"))
-        assertEquals("code", url.queryParameter("response_type"))
-        assertEquals(MicrosoftAuthClient.REDIRECT_URI, url.queryParameter("redirect_uri"))
-        assertTrue(url.toString().contains("oauth20_authorize"))
+        assertTrue(url.contains("login.live.com/oauth20_authorize"))
+        assertTrue(url.contains("client_id=${MicrosoftAuthClient.CLIENT_ID}"))
+        assertTrue(url.contains("redirect_url="))
+        assertTrue(!url.contains("redirect_uri="))
     }
 
     @Test
@@ -68,6 +67,15 @@ class MicrosoftAuthRedirectTest {
             "https://login.live.com/oauth20_desktop.srf?code=ABC123&lc=1033",
         )
         assertEquals("ABC123", code)
+    }
+
+    @Test
+    fun extractsCodeFromMsXalRedirect() {
+        val code = auth.codeFromRedirect(
+            "ms-xal-00000000402b5328://auth/?code=XYZ789&state=1",
+        )
+        assertEquals("XYZ789", code)
+        assertTrue(auth.isLoginRedirect("ms-xal-00000000402b5328://auth/?code=XYZ789"))
     }
 
     @Test
@@ -81,6 +89,11 @@ class MicrosoftAuthRedirectTest {
         auth.codeFromRedirect(
             "https://login.live.com/oauth20_desktop.srf?error=access_denied&error_description=user%20cancelled",
         )
+    }
+
+    @Test(expected = AuthException::class)
+    fun mapsCancelOnMsXal() {
+        auth.codeFromRedirect("ms-xal-00000000402b5328://auth/?res=cancel")
     }
 }
 
@@ -96,5 +109,76 @@ class AccountModelTest {
         )
         assertEquals("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", account.uuidDashed)
         assertTrue(account.skinUrl.contains("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"))
+        assertEquals(AuthKind.XBOX_LIVE, account.kind)
+    }
+}
+
+class LaunchPlanTest {
+    @Test
+    fun roundTripsJson() {
+        val plan = LaunchPlan(
+            minecraftId = "1.21.4",
+            versionName = "fabric-loader-0.16.9-1.21.4",
+            mainClass = "net.fabricmc.loader.impl.launch.knot.KnotClient",
+            classpath = listOf("/tmp/a.jar", "/tmp/b.jar"),
+            nativesDir = "/tmp/natives",
+            gameDir = "/tmp/game",
+            assetsDir = "/tmp/assets",
+            assetIndex = "17",
+            clientJar = "/tmp/client.jar",
+            loader = "fabric",
+        )
+        val json = CobbledJson.encodeToString(LaunchPlan.serializer(), plan)
+        val back = CobbledJson.decodeFromString(LaunchPlan.serializer(), json)
+        assertEquals(plan, back)
+        assertTrue(json.contains("KnotClient"))
+    }
+}
+
+class LibrarySupportTest {
+    @Test
+    fun mavenPathBuildsStandardJar() {
+        assertEquals(
+            "com/mojang/logging/1.2.7/logging-1.2.7.jar",
+            LibrarySupport.mavenPath("com.mojang:logging:1.2.7"),
+        )
+    }
+
+    @Test
+    fun mavenPathKeepsClassifier() {
+        assertEquals(
+            "org/lwjgl/lwjgl/3.3.3/lwjgl-3.3.3-natives-linux-arm64.jar",
+            LibrarySupport.mavenPath("org.lwjgl:lwjgl:3.3.3:natives-linux-arm64"),
+        )
+    }
+
+    @Test
+    fun librariesWithoutRulesAreAllowed() {
+        assertTrue(LibrarySupport.allowedOnLinux(null))
+        assertTrue(LibrarySupport.allowedOnLinux(emptyList()))
+    }
+
+    @Test
+    fun osxOnlyLibrariesAreSkipped() {
+        val rules = listOf(
+            MojangRule("allow", MojangOsRule("osx")),
+        )
+        assertTrue(!LibrarySupport.allowedOnLinux(rules))
+    }
+
+    @Test
+    fun linuxAllowWins() {
+        val rules = listOf(
+            MojangRule("allow", null),
+            MojangRule("disallow", MojangOsRule("osx")),
+        )
+        assertTrue(LibrarySupport.allowedOnLinux(rules))
+    }
+
+    @Test
+    fun nativeArtifactsAreDetected() {
+        assertTrue(LibrarySupport.isNativeArtifact("org.lwjgl:lwjgl:3.3.3:natives-linux"))
+        assertTrue(LibrarySupport.isNativeArtifact("lwjgl", "org/lwjgl/lwjgl/3.3.3/lwjgl-3.3.3-natives-linux.jar"))
+        assertTrue(!LibrarySupport.isNativeArtifact("com.mojang:logging:1.2.7", "com/mojang/logging/1.2.7/logging-1.2.7.jar"))
     }
 }

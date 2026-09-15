@@ -77,6 +77,27 @@ class VersionRepository(
         }
     }
 
+    suspend fun fabricProfile(minecraft: String, loader: String): FabricProfileJson = withContext(Dispatchers.IO) {
+        val url = "$FABRIC_LOADER/$minecraft/$loader/profile/json"
+        val req = Request.Builder().url(url).get().build()
+        http.newCall(req).execute().use { res ->
+            val text = res.body?.string().orEmpty()
+            if (!res.isSuccessful) {
+                throw IllegalStateException("No Fabric profile for $minecraft / $loader (${res.code})")
+            }
+            CobbledJson.decodeFromString(FabricProfileJson.serializer(), text)
+        }
+    }
+
+    suspend fun assetIndex(url: String): AssetIndexFile = withContext(Dispatchers.IO) {
+        val req = Request.Builder().url(url).get().build()
+        http.newCall(req).execute().use { res ->
+            val text = res.body?.string().orEmpty()
+            if (!res.isSuccessful) throw IllegalStateException("Asset index failed (${res.code})")
+            CobbledJson.decodeFromString(AssetIndexFile.serializer(), text)
+        }
+    }
+
     private fun fetchManifest(): MojangManifest {
         val req = Request.Builder().url(MANIFEST).get().build()
         http.newCall(req).execute().use { res ->
@@ -115,6 +136,7 @@ data class MojangVersion(
 @Serializable
 data class MojangVersionMeta(
     val id: String? = null,
+    val mainClass: String? = null,
     val downloads: MojangDownloads? = null,
     val libraries: List<MojangLibrary> = emptyList(),
     val assetIndex: MojangAssetIndex? = null,
@@ -142,6 +164,7 @@ data class MojangLibrary(
 @Serializable
 data class MojangLibraryDownloads(
     val artifact: MojangPathArtifact? = null,
+    val classifiers: Map<String, MojangPathArtifact> = emptyMap(),
 )
 
 @Serializable
@@ -167,6 +190,34 @@ data class MojangOsRule(
 data class MojangAssetIndex(
     val id: String,
     val url: String,
+    val sha1: String? = null,
+    val size: Long? = null,
+    val totalSize: Long? = null,
+)
+
+@Serializable
+data class AssetIndexFile(
+    val objects: Map<String, AssetObject> = emptyMap(),
+)
+
+@Serializable
+data class AssetObject(
+    val hash: String,
+    val size: Long = 0,
+)
+
+@Serializable
+data class FabricProfileJson(
+    val id: String? = null,
+    val inheritsFrom: String? = null,
+    val mainClass: String? = null,
+    val libraries: List<FabricProfileLibrary> = emptyList(),
+)
+
+@Serializable
+data class FabricProfileLibrary(
+    val name: String,
+    val url: String? = null,
 )
 
 @Serializable

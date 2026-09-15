@@ -3,7 +3,7 @@ package com.deepslate.cobbled.core
 import kotlinx.serialization.Serializable
 
 const val APP_NAME = "Cobbled Deepslate Client"
-const val APP_VERSION = "0.1.0-alpha"
+const val APP_VERSION = "0.2.0-alpha"
 const val USER_AGENT = "CobbledDeepslate/$APP_VERSION (+https://github.com/dragos300/deepslate-client)"
 
 @Serializable
@@ -16,6 +16,7 @@ data class McAccount(
     val accessToken: String,
     val refreshToken: String,
     val xuid: String,
+    val kind: AuthKind = AuthKind.XBOX_LIVE,
 ) {
     val uuidDashed: String
         get() {

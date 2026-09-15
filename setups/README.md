@@ -6,7 +6,7 @@ They are too large for GitHub’s git file limit (~100 MB), so desktop binaries 
 
 The Android preview APK is small enough to keep here:
 
-- [`Cobbled-Deepslate-Client-0.1.0-debug.apk`](Cobbled-Deepslate-Client-0.1.0-debug.apk) — Cobbled Deepslate Client (debug). Sideload on a phone; the game runtime is not wired yet.
+- [`Cobbled-Deepslate-Client-0.2.0-debug.apk`](Cobbled-Deepslate-Client-0.2.0-debug.apk) — Cobbled Deepslate Client 0.2.0-alpha (debug). Microsoft login + Pojav Java runtime. Sideload on a phone.
 
 Each platform folder (`windows/`, `macos/`, `linux/`) includes the installer plus `INSTALL.txt`.
 
