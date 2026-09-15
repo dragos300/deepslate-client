@@ -2,6 +2,17 @@
 
 Android launcher for **Minecraft Java Edition**. Same mineral UI as desktop Deepslate, Microsoft login, version picking, Modrinth search, and instance file download.
 
+## Install on a phone (no computer)
+
+1. On the phone, open this file and download it:  
+   [`setups/Cobbled-Deepslate-Client-0.1.0-debug.apk`](../setups/Cobbled-Deepslate-Client-0.1.0-debug.apk)
+2. Open the downloaded APK. If Android blocks it, allow installs from **Chrome** / **Files** / **GitHub** (whichever you used).
+3. Open **Cobbled Deepslate**, sign in with a Microsoft account that **owns Java Edition**, then tap Play.
+
+The game will not start yet. Play downloads the official client; the on-device Java runtime is still the next slice.
+
+This is an unsigned **debug** build (`com.deepslate.cobbled.debug`). Android will warn that it is not from Play. That is expected.
+
 The on-device Java / OpenGL runtime is not in this slice yet. Play will sign you in, resolve a version, and download the official client jar. Starting the game comes next.
 
 ## Requirements

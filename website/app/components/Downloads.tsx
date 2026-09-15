@@ -134,7 +134,7 @@ export default function Downloads({ downloads }: { downloads: PlatformDownloads 
           </a>
           <a
             className="ghost-btn"
-            href={`${GITHUB_REPO}/tree/main/android`}
+            href={`${GITHUB_REPO}/raw/main/setups/Cobbled-Deepslate-Client-0.1.0-debug.apk`}
             target="_blank"
             rel="noreferrer"
           >
