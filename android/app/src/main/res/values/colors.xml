@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="deepslate_bg">#06080A</color>
+    <color name="deepslate_ink">#F2F5F3</color>
+    <color name="deepslate_accent">#3FD4B8</color>
+    <color name="ic_launcher_bg">#0A1012</color>
+</resources>

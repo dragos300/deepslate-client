@@ -76,12 +76,16 @@ export default async function HomePage() {
               <em>isn&apos;t useless.</em>
             </h1>
             <p className="lede">
-              Dark mineral UI, Fabric mods, and a HUD you can actually place. Windows, macOS, and Linux — Microsoft,
-              Offline, or Guest.
+              Dark mineral UI, Fabric mods, and a HUD you can actually place. Windows, macOS, and Linux now —
+              Cobbled Deepslate Client is the Android launcher in progress. Microsoft, Offline, or Guest on
+              desktop.
             </p>
             <div className="pills">
               <span className="pill">
                 <strong>Windows</strong> · macOS · Linux
+              </span>
+              <span className="pill">
+                <strong>Android</strong> · Cobbled preview
               </span>
               <span className="pill">
                 <strong>Java</strong> Edition

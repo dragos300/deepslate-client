@@ -2,7 +2,11 @@
 
 Built Windows, macOS, and Linux setups are copied here after a desktop build.
 
-They are too large for GitHub’s git file limit (~100 MB), so binaries stay local / on [GitHub Releases](https://github.com/dragos300/deepslate-client/releases).
+They are too large for GitHub’s git file limit (~100 MB), so desktop binaries stay local / on [GitHub Releases](https://github.com/dragos300/deepslate-client/releases).
+
+The Android preview APK is small enough to keep here:
+
+- [`Cobbled-Deepslate-Client-0.2.0-debug.apk`](Cobbled-Deepslate-Client-0.2.0-debug.apk) — Cobbled Deepslate Client 0.2.0-alpha (debug). Microsoft login + Pojav Java runtime. Sideload on a phone.
 
 Each platform folder (`windows/`, `macos/`, `linux/`) includes the installer plus `INSTALL.txt`.
 
