@@ -25,3 +25,11 @@ setups/windows/
 setups/macos/
 setups/linux/
 *.tsbuildinfo
+android/.gradle/
+android/**/build/
+android/local.properties
+android/.idea/
+android/*.iml
+android/captures/
+android/app/release/
+android/.kotlin/

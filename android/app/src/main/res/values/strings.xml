@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cobbled Deepslate</string>
+    <string name="app_name_full">Cobbled Deepslate Client</string>
+    <string name="microsoft_login">Microsoft login</string>
+</resources>

@@ -132,6 +132,14 @@ export default function Downloads({ downloads }: { downloads: PlatformDownloads 
           <a className="ghost-btn" href={GITHUB_REPO} target="_blank" rel="noreferrer">
             View source
           </a>
+          <a
+            className="ghost-btn"
+            href={`${GITHUB_REPO}/tree/main/android`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Cobbled for Android
+          </a>
         </div>
       </div>
     </section>

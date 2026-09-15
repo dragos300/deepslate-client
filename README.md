@@ -23,6 +23,18 @@ npm run copy-setups # copy artifacts into setups/
 
 Output goes to `desktop/release/`, then `setups/`. macOS builds need a Mac or the **Build installers** GitHub Action.
 
+## Android (Cobbled Deepslate Client)
+
+Preview launcher in [`android/`](android/). Microsoft login, version picking, and official client download on Android 8+. The on-device Java runtime is not wired yet, so the game does not start on the phone in this slice.
+
+Open the `android/` folder in Android Studio (JDK 17+). Debug APK:
+
+```bash
+cd android
+./gradlew :core:test
+./gradlew :app:assembleDebug
+```
+
 ## Game data
 
 Uses the same instance folder as the Python app:
